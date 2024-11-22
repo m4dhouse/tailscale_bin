@@ -12,7 +12,7 @@ if [ -f /usr/bin/tailscaled ];then
 else
   echo ""
 fi;
-wget -qO /tmp/tailscale.ipk "https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.76.1_arm_all.ipk" >/dev/null 2>&1
+wget -qO /tmp/tailscale.ipk "https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.76.6_arm_all.ipk" >/dev/null 2>&1
 opkg --force-reinstall --force-overwrite install /tmp/tailscale.ipk >/dev/null 2>&1
 chmod 777 /usr/bin/tailscale
 chmod 777 /usr/bin/tailscaled
