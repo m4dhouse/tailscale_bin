@@ -1,23 +1,46 @@
 #!/bin/sh
 echo "check_certificate = off" >> ~/.wgetrc
-echo "Install Wireguard Tailscale"
+
+echo "Installing Wireguard Tailscale"
 echo ""
-if [ -f /usr/bin/tailscale ];then
-  rm -r /usr/bin/tailscale >/dev/null 2>&1
-else
-  echo ""
-fi;
-if [ -f /usr/bin/tailscaled ];then
-  rm -r /usr/bin/tailscaled >/dev/null 2>&1
-else
-  echo ""
-fi;
-wget -qO /tmp/tailscale.ipk "https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.76.6_arm_all.ipk" >/dev/null 2>&1
+
+[ -f /usr/bin/tailscale ] && rm -f /usr/bin/tailscale
+[ -f /usr/bin/tailscaled ] && rm -f /usr/bin/tailscaled
+
+ARCH=$(uname -m)
+
+case "$ARCH" in
+  arm*)
+    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.78.1_arm_all.ipk"
+    ;;
+  mips*)
+    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.78.1_mipsel_all.ipk"
+    ;;
+  *)
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+    ;;
+esac
+
+wget -qO /tmp/tailscale.ipk "$TAILSCALE_URL"
+if [ $? -ne 0 ]; then
+  echo "Error downloading Tailscale package"
+  exit 1
+fi
+
 opkg --force-reinstall --force-overwrite install /tmp/tailscale.ipk >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Error installing Tailscale package"
+  rm -f /tmp/tailscale.ipk
+  exit 1
+fi
+
 chmod 777 /usr/bin/tailscale
 chmod 777 /usr/bin/tailscaled
 chmod 777 /etc/init.d/tailscale
-rm -rf /tmp/tailscale.ipk
-echo "Wireguard tailscale installed"
+
+rm -f /tmp/tailscale.ipk
+
+echo "Wireguard Tailscale successfully installed"
 sleep 3
 exit 0
