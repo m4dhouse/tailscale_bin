@@ -13,10 +13,10 @@ ARCH=$(uname -m)
 
 case "$ARCH" in
   arm*)
-    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.88.1_arm_all.ipk"
+    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.88.3_arm_all.ipk"
     ;;
   mips*)
-    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.88.1_mipsel_all.ipk"
+    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_1.88.3_mipsel_all.ipk"
     ;;
   *)
     echo "Unsupported architecture: $ARCH"
