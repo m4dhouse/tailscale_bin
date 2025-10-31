@@ -11,7 +11,7 @@ BOXNAME=$(head -n 1 /etc/hostname)
 
 ARCH=$(uname -m)
 
-VERSION="1.90.2"
+VERSION="1.90.5"
 
 case "$ARCH" in
   arm*)
