@@ -11,14 +11,17 @@ BOXNAME=$(head -n 1 /etc/hostname)
 
 ARCH=$(uname -m)
 
-VERSION="1.92.5"
+VERSION="1.104.1"
 
 case "$ARCH" in
   arm*)
-    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_${VERSION}_arm_all.ipk"
+    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale-boxguard-arm_${VERSION}_all.ipk"
+    ;;
+  aarch*)
+    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale-boxguard-aarch_${VERSION}_all.ipk"
     ;;
   mips*)
-    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale_${VERSION}_mipsel_all.ipk"
+    TAILSCALE_URL="https://raw.githubusercontent.com/m4dhouse/tailscale_bin/main/tailscale-boxguard-mips_${VERSION}_all.ipk"
     ;;
   *)
     echo "Unsupported architecture: $ARCH"
