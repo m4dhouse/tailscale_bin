@@ -16,6 +16,11 @@ if ! command -v curl >/dev/null 2>&1; then
   fi
 fi
 
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "ERRORE: python3 non disponibile. Installalo prima di procedere."
+  exit 1
+fi
+
 BOXNAME=$(head -n 1 /etc/hostname)
 
 [ -f /usr/bin/tailscale ] && rm -f /usr/bin/tailscale
@@ -41,12 +46,20 @@ esac
 
 JSON_URL="https://pkgs.tailscale.com/stable/?mode=json"
 echo "Recupero l'ultima versione da $JSON_URL ..."
-TARBALL=$(curl -fsSL --insecure "$JSON_URL" \
-  | grep -o "\"${TS_KEY}\":\"[^\"]*\"" \
-  | cut -d'"' -f4)
+
+TARBALL=$(curl -fsSL --insecure "$JSON_URL" | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin)
+    print(data['Tarballs']['${TS_KEY}'])
+except Exception as e:
+    sys.stderr.write('parse error: %s\n' % e)
+")
 
 if [ -z "$TARBALL" ]; then
   echo "ERRORE: impossibile determinare l'ultima versione per ${TS_KEY}."
+  echo "Verifica la connessione con:"
+  echo "  curl -fsSL --insecure '$JSON_URL' | head -n 20"
   exit 1
 fi
 
