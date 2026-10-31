@@ -1,0 +1,62 @@
+#!/bin/sh
+
+if [ ! -d /var/lib/tailscale ] ; then
+	mkdir -p /var/lib/tailscale
+fi
+if [ ! -d /run/tailscale ] ; then
+	mkdir -p /var/run/tailscale
+fi
+
+check_internet_connection() {
+    local timeout=1
+    local max_attempts=10
+
+    for _ in $(seq "$max_attempts"); do
+        if ping -q -c 1 -W "$timeout" 8.8.8.8 >/dev/null; then
+            return 0  # Success
+        fi
+        sleep 1
+    done
+
+    return 1  # Failure after max_attempts
+}
+
+modprobe tun
+
+TAILSCALED_LOGFILE="/var/log/tailscaled.log"
+TAILSCALED_PORT="41641"
+TAILSCALED=/usr/bin/tailscaled
+
+ARGS="--state=/var/lib/tailscale/tailscaled.state --socket=/var/run/tailscale/tailscaled.sock -tun userspace-networking -port ${TAILSCALED_PORT}"
+
+test -f $TAILSCALED || exit 0
+
+case "$1" in
+	start)
+		echo "Starting tailscaled"
+		if check_internet_connection; then
+			start-stop-daemon -b --start --startas $TAILSCALED -- $ARGS
+			echo "done"
+		else
+			echo "No internet connection"
+		fi
+		;;
+	stop)
+		echo "Stopping tailscaled"
+		start-stop-daemon -K -x $TAILSCALED
+		echo "done"
+		;;
+	restart|reload|force-reload)
+		echo "Restarting tailscaled"
+		start-stop-daemon -K -x $TAILSCALED
+		sleep 5
+		start-stop-daemon -b --start --startas $TAILSCALED -- $ARGS
+		echo "done"
+		;;
+	*)
+		echo "Usage: /etc/init.d/tailscaled {start|stop|restart|reload|force-reload}"
+		exit 1
+		;;
+esac
+
+exit 0
